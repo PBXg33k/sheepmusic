@@ -3,6 +3,7 @@
 namespace BlackSheep\MusicScannerBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -18,7 +19,9 @@ class ImportMusicCommand extends ContainerAwareCommand
     {
         $this
             ->setName('music_scanner:import_music_command')
-            ->setDescription('Hello PhpStorm');
+            ->setDescription('Hello PhpStorm')
+            ->addArgument('path', InputArgument::REQUIRED, 'Mediapath, ie: /Volumes/Data/Stack/Music')
+        ;
     }
 
     /**
@@ -27,7 +30,7 @@ class ImportMusicCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $importer = $this->getContainer()->get('black_sheep_music_scanner.services.media_importer');
-        $importer->setOutputInterface($output, false);
-        $importer->import('/Volumes/Data/Stack/Music');
+        $importer->setOutputInterface($output, true);
+        $importer->import($input->getArgument('path'));
     }
 }
