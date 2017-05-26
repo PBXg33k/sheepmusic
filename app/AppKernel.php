@@ -31,6 +31,7 @@ class AppKernel extends Kernel
             new BlackSheep\LastFmBundle\BlackSheepLastFmBundle(),
             new BlackSheep\UserBundle\BlackSheepUserBundle(),
             new FOS\ElasticaBundle\FOSElasticaBundle(),
+            new Oneup\FlysystemBundle\OneupFlysystemBundle(),
         ];
 
         if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {

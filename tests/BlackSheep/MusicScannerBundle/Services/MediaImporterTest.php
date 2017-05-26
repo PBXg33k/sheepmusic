@@ -10,9 +10,12 @@ namespace Tests\BlackSheep\MusicScannerBundle\Services;
 
 use BlackSheep\MusicScannerBundle\Services\MediaImporter;
 use BlackSheep\MusicScannerBundle\Services\SongImporter;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Memory\MemoryAdapter;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Finder\SplFileInfo;
 use org\bovigo\vfs;
+use Twistor\FlysystemStreamWrapper;
 
 class MediaImporterTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,8 +46,7 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
 
         $this->mediaImporter = new MediaImporter($managerRepositoryMock, $songImporterMock);
 
-        $this->testDirectory = vfs\vfsStream::setup('music');
-        $this->testDirectory->addChild((new vfs\vfsStreamFile('test-file.flac')));
+        $this->testDirectory = __DIR__.'/../../../';
     }
 
     /**
@@ -52,10 +54,11 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
      */
     public function gatherFilesReturnListOfFileInfo()
     {
-        $files = $this->mediaImporter->gatherFiles($this->testDirectory->url());
+        $files = $this->mediaImporter->gatherFiles($this->testDirectory);
 
         $this->assertEquals(1, $files->files()->count());
-        $this->assertArrayHasKey('vfs://music/test-file.flac', $files->getIterator());
+
+        $this->assertArrayHasKey(__DIR__.'/../../../flac-file.flac', $files->getIterator());
         $this->assertInstanceOf(SplFileInfo::class, $files->getIterator()->current());
     }
 
@@ -65,9 +68,26 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('importSong')
             ->with(
-                $this->mediaImporter->gatherFiles($this->testDirectory->url())->files()->getIterator()->current()
+                $this->mediaImporter->gatherFiles($this->testDirectory)->files()->getIterator()->current()
             );
 
-        $this->mediaImporter->import($this->testDirectory->url());
+        $this->mediaImporter->import($this->testDirectory);
+    }
+
+    public function testFlySystemAdapter()
+    {
+        $filesystem = new Filesystem(new MemoryAdapter());
+        $filesystem->put('memory-flac.flac', file_get_contents($this->testDirectory . 'flac-file.flac'));
+
+        FlysystemStreamWrapper::register('fsotf', $filesystem);
+
+        $this->songImporterMock
+            ->expects($this->once())
+            ->method('importSong')
+            ->with(
+                $this->mediaImporter->gatherFiles('fsotf://')->files()->getIterator()->current()
+            );
+
+        $this->mediaImporter->import($filesystem);
     }
 }

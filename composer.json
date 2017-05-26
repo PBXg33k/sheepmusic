@@ -38,7 +38,9 @@
         "matto1990/lastfm-api": "^1.5",
         "ruflin/elastica": "^5.2.0",
         "friendsofsymfony/elastica-bundle": "dev-master",
-        "mikey179/vfsStream": "^1.6"
+        "mikey179/vfsStream": "^1.6",
+        "oneup/flysystem-bundle": "^1.13",
+        "twistor/flysystem-stream-wrapper": "^1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",
@@ -49,7 +51,8 @@
         "behat/mink": "^1.7",
         "behat/mink-extension": "^2.2",
         "behat/mink-browserkit-driver": "^1.3",
-        "behat/mink-selenium2-driver": "^1.3"
+        "behat/mink-selenium2-driver": "^1.3",
+        "league/flysystem-memory": "^1.0"
     },
     "scripts": {
         "post-install-cmd": [

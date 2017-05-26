@@ -10,11 +10,15 @@ namespace BlackSheep\MusicScannerBundle\Services;
 
 use BlackSheep\MusicLibraryBundle\Entity\SongEntity;
 use BlackSheep\MusicLibraryBundle\Repository\SongsRepository;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Plugin\ListPaths;
 use SplFileInfo;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use Twistor\FlysystemStreamWrapper;
 
 /**
  * Import some media.
@@ -84,7 +88,9 @@ class MediaImporter
      */
     public function import($path)
     {
+        $this->createFileSystemOnTheFly($path);
         $this->path = $path;
+
         // Make service calls out of these
         $this->songsRepository = $this->managerRegistry->getRepository(
             SongEntity::class
@@ -99,6 +105,7 @@ class MediaImporter
             $this->debugStep('imported', $file->getFilename());
             unset($file);
         }
+        $this->destroyFileSystemWrapper();
         $this->debugEnd();
     }
 
@@ -117,6 +124,35 @@ class MediaImporter
             ->in($path)
             ->date('since last week')
             ->sortByModifiedTime();
+    }
+
+    /**
+     * Replaces $path with a registered stream wrapper protocol
+     *
+     * @param $path
+     * @return Filesystem
+     */
+    private function createFileSystemOnTheFly(&$path, $wrapperPrefix = 'fsotf')
+    {
+        if(is_string($path)) {
+            $adapter = new Local($path);
+            $filesystem = new Filesystem($adapter);
+        } elseif($path instanceof Filesystem) {
+            $filesystem = $path;
+        }
+
+        FlysystemStreamWrapper::register($wrapperPrefix, $filesystem);
+
+        // Replace $path with the steam wrapper protocol,
+        // this path resolves to exactly the same location
+        $path = $wrapperPrefix . '://';
+
+        return $filesystem;
+    }
+
+    private function destroyFileSystemWrapper($wrapperPrefix = 'fsotf')
+    {
+        FlysystemStreamWrapper::unregister($wrapperPrefix);
     }
 
     /**
