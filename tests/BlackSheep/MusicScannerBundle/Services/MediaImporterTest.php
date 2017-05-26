@@ -14,7 +14,6 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Finder\SplFileInfo;
-use org\bovigo\vfs;
 use Twistor\FlysystemStreamWrapper;
 
 class MediaImporterTest extends \PHPUnit_Framework_TestCase
@@ -25,7 +24,7 @@ class MediaImporterTest extends \PHPUnit_Framework_TestCase
     protected $mediaImporter;
 
     /**
-     * @var vfs\vfsStreamDirectory
+     * @var string
      */
     protected $testDirectory;
 
