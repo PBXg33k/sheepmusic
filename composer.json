@@ -38,7 +38,6 @@
         "matto1990/lastfm-api": "^1.5",
         "ruflin/elastica": "^5.2.0",
         "friendsofsymfony/elastica-bundle": "dev-master",
-        "mikey179/vfsStream": "^1.6",
         "oneup/flysystem-bundle": "^1.13",
         "twistor/flysystem-stream-wrapper": "^1.0"
     },
